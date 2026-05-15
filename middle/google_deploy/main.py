@@ -137,8 +137,7 @@ def structure_response(user_query: str, pinecone_matches: list[dict]) -> dict:
             f"If the sources do not answer the question, say so explicitly.\n"
             f"2. \"citations\": an array with exactly {len(sources)} objects, one per source in order. "
             f"Each object must have \"index\" (integer) and \"relevant_passages\" "
-            f"(a list of verbatim quotes copied ONLY from the TEXT of the source with that exact index — "
-            f"do not quote text from any other source — "
+            f"(a list of verbatim quotes from that source's TEXT that are relevant to the question — "
             f"include any text from this source that you quoted directly in the summary — "
             f"each quote must be one or more complete sentences, never cut off mid-word or mid-sentence — empty list if none are relevant)."
         )}]}],
