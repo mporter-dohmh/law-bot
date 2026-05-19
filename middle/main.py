@@ -21,11 +21,13 @@ def _get_prompt(name: str) -> str:
 
 
 def _filter_citations(summary: str, valid_sections: set) -> str:
-    """Strip §-citations from summary that have no corresponding retrieved source."""
+    """Strip §-citations from summary that have no corresponding retrieved source, and remove any stray [N] index citations."""
     def clean(m):
         kept = [s for s in re.findall(r'§([\d.\-]+)', m.group(0)) if s in valid_sections]
         return '(' + ', '.join(f'§{s}' for s in kept) + ')' if kept else ''
-    return re.sub(r'\((?:§[\d.\-]+(?:,\s*)?)+\)', clean, summary).strip()
+    result = re.sub(r'\((?:§[\d.\-]+(?:,\s*)?)+\)', clean, summary)
+    result = re.sub(r'\s*\[\d+\]', '', result)
+    return result.strip()
 
 
 def _gemini_post(url, payload):
@@ -93,7 +95,7 @@ def structure_response(user_query, pinecone_matches):
             "text": combined_text
         })
         section_numbers.append(key[1])
-        context_bits.append(f"[{i}] {entry['full_title']}\nURL: {entry['url']}\nTEXT: {combined_text}")
+        context_bits.append(f"Source {i}: {entry['full_title']}\nURL: {entry['url']}\nTEXT: {combined_text}")
 
     context_str = "\n\n---\n\n".join(context_bits)
 
